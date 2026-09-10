@@ -51,6 +51,11 @@ The repository follows a practical learning path:
 * An S3 Gateway Endpoint allows traffic to reach S3 without travelling through the public internet.
 * Bucket policies and endpoint policies provide separate layers of access control and can be tested using explicit allow and deny rules.
 
+## Improvements
+
+* Automating VPC creation with the use of the Boto3 library in Python
+* [View Directory for script/s](python-vpc-scripting/)
+
 ## Security Note
 
 These projects were created for learning in a personal AWS environment. Credentials and other sensitive values are not stored in this repository. In a production environment, EC2 instances should use IAM roles with least-privilege permissions instead of long-term access keys.
