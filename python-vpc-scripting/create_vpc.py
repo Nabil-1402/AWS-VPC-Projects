@@ -1,11 +1,13 @@
 import boto3
 from botocore.exceptions import ClientError
 
+#inital ec2 to connect boto3 to AWS
 ec2 = boto3.client(
     "ec2",
     region_name="eu-west-2"
 )
 
+#VPC creation
 response = ec2.create_vpc(
     CidrBlock="10.0.0.0/16",
     TagSpecifications=[
@@ -25,6 +27,8 @@ vpc_id = response["Vpc"]["VpcId"]
 
 print(f"Created VPC: {vpc_id}")
 
+
+#Subnet creation
 subnet_response = ec2.create_subnet(
     VpcId=vpc_id,
     CidrBlock="10.0.0.0/24",
@@ -45,6 +49,7 @@ ec2.create_tags(
 
 print(f"Created Subnet: {subnet_id}")
 
+# Automatically assign a public IPv4 address to instances launched in this subnet
 ec2.modify_subnet_attribute(
     SubnetId=subnet_id,
     MapPublicIpOnLaunch={
@@ -52,7 +57,7 @@ ec2.modify_subnet_attribute(
     },
 )
 
-
+#Internet gateway creation
 igw_response = ec2.create_internet_gateway()
 igw_id = igw_response["InternetGateway"]["InternetGatewayId"]
 
@@ -68,11 +73,13 @@ ec2.create_tags(
 
 print(f"Created Internet Gateway: {igw_id}")
 
+#Attach VPC to internet gateway
 ec2.attach_internet_gateway(
     InternetGatewayId=igw_id,
     VpcId=vpc_id,
 )
 
+#Route table creation
 route_table_response = ec2.create_route_table(
     VpcId=vpc_id,
 )
@@ -91,12 +98,14 @@ ec2.create_tags(
 
 print(f"Created Route Table: {route_table_id}")
 
+#Add a route to route table
 ec2.create_route(
     RouteTableId=route_table_id,
     DestinationCidrBlock="0.0.0.0/0",
     GatewayId=igw_id,
 )
 
+#Associate route table with the subnet
 ec2.associate_route_table(
     RouteTableId=route_table_id,
     SubnetId=subnet_id,
